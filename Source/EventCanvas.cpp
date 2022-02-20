@@ -205,7 +205,7 @@ void EventCanvas::UpdateNumColumns()
    else
    {
       mCanvas->RescaleNumCols(TheTransport->GetDuration(kInterval_1n)/TheTransport->GetDuration(mInterval) * mNumMeasures);
-      mCanvas->SetMajorColumnInterval(-1);
+      mCanvas->SetMajorColumnInterval(8);
    }
 }
 
