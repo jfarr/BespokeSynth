@@ -32,6 +32,7 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
+#include "TextEntry.h"
 #include "IAudioPoller.h"
 
 class ITimeListener
@@ -90,7 +91,7 @@ struct TransportListenerInfo
    int mCustomDivisor;
 };
 
-class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
+class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    Transport();
@@ -108,6 +109,7 @@ public:
    double MsPerBar() const { return 60.0/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
    void Start();
    void Advance(double ms);
+   void SetTransportPosition(double time);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
    TransportListenerInfo* GetListenerInfo(ITimeListener* listener);
@@ -143,6 +145,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -154,15 +157,17 @@ public:
    
 private:
    void UpdateListeners(double jumpMs);
+   void UpdateAudioPollers(float amount);
    double Swing(double measurePos);
    double SwingBeat(double pos);
    void Nudge(double amount);
    void AdjustTempo(double amount);
    void ToggleAudioPaused();
+   void UpdateMeasurePos();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 100; }
+   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 110; }
    bool Enabled() const override { return true; }
    
    float mTempo;
@@ -185,6 +190,10 @@ private:
    ClickButton* mIncreaseTempoButton;
    ClickButton* mDecreaseTempoButton;
    FloatSlider* mTempoSlider;
+   int mMeasure;
+   float mMeasurePos;
+   TextEntry* mMeasureEntry;
+   FloatSlider* mMeasurePosSlider;
    int mLoopStartMeasure;
    int mLoopEndMeasure;
 
