@@ -93,8 +93,6 @@ target_sources(BespokeSynth PRIVATE
     ClipArranger.h
     ClipLauncher.cpp
     ClipLauncher.h
-    CodeEntry.cpp
-    CodeEntry.h
     ComboGridController.cpp
     ComboGridController.h
     CommentDisplay.cpp
@@ -574,11 +572,7 @@ target_sources(BespokeSynth PRIVATE
     ScaleDegree.h
     ScaleDetect.cpp
     ScaleDetect.h
-    ScriptModule.cpp
-    ScriptModule.h
     ScriptModule_PythonInterface.i
-    ScriptStatus.cpp
-    ScriptStatus.h
     SeaOfGrain.cpp
     SeaOfGrain.h
     Selector.cpp
@@ -686,6 +680,17 @@ target_sources(BespokeSynth PRIVATE
     ofxJSONElement.cpp
     ofxJSONElement.h
     )
+
+if(BESPOKE_PYTHON_SUPPORT)
+target_sources(BespokeSynth PRIVATE
+    CodeEntry.cpp
+    CodeEntry.h
+    ScriptModule.cpp
+    ScriptModule.h
+    ScriptStatus.cpp
+    ScriptStatus.h
+    )
+endif()
 
 if(BESPOKE_NIGHTLY)
     target_compile_definitions(BespokeSynth PRIVATE

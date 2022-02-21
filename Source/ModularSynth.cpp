@@ -26,7 +26,9 @@
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
+#if defined(BESPOKE_PYTHON_SUPPORT)
 #include "ScriptModule.h"
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
 #include "Prefab.h"
@@ -131,7 +133,9 @@ ModularSynth::~ModularSynth()
    assert(TheSynth == this);
    TheSynth = nullptr;
    
+#if defined(BESPOKE_PYTHON_SUPPORT)
    ScriptModule::UninitializePython();
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 }
 
 void ModularSynth::CrashHandler(void*)
@@ -505,6 +509,7 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
 
+#if defined(BESPOKE_PYTHON_SUPPORT)
    if (ScriptModule::sBackgroundTextString != "")
    {
       ofPushStyle();
@@ -512,7 +517,8 @@ void ModularSynth::Draw(void* vg)
       DrawTextBold(ScriptModule::sBackgroundTextString, ScriptModule::sBackgroundTextPos.x, ScriptModule::sBackgroundTextPos.y + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
       ofPopStyle();
    }
-   
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
+
    if (UserPrefs.draw_background_lissajous.Get())
       DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
    
@@ -2029,7 +2035,9 @@ void ModularSynth::ResetLayout()
    mMoveModule = nullptr;
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
+#if defined(BESPOKE_PYTHON_SUPPORT)
    ScriptModule::sBackgroundTextString = "";
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
    
    mErrors.clear();
    
@@ -2179,7 +2187,9 @@ bool ModularSynth::LoadLayoutFromString(std::string jsonString)
 
 void ModularSynth::LoadLayout(ofxJSONElement json)
 {
-   ScriptModule::UninitializePython();
+#if defined(BESPOKE_PYTHON_SUPPORT)
+    ScriptModule::UninitializePython();
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
    Transport::sDoEventLookahead = false;
    
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);

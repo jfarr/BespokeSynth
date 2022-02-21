@@ -36,7 +36,9 @@
 #include "PatchCableSource.h"
 #include "GridController.h"
 #include "MidiCapturer.h"
+#if defined(BESPOKE_PYTHON_SUPPORT)
 #include "ScriptModule.h"
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 #include "Push2Control.h"
 
 using namespace juce;
@@ -680,8 +682,10 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          SendCC(mControllerPage, control, 0);
    }*/
 
+#if defined(BESPOKE_PYTHON_SUPPORT)
    for (auto* script : mScriptListeners)
       script->MidiReceived(messageType, control, value, channel);
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 }
 
 void MidiController::AddScriptListener(ScriptModule* script)

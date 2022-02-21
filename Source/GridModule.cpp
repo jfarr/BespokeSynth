@@ -32,7 +32,9 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "MidiController.h"
+#if defined(BESPOKE_PYTHON_SUPPORT)
 #include "ScriptModule.h"
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 #include "PatchCableSource.h"
 
 GridModule::GridModule()
@@ -100,9 +102,11 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
 {
    if (y < GetRows() && x < GetCols())
    {
-      for (auto listener : mScriptListeners)
+#if defined(BESPOKE_PYTHON_SUPPORT)
+       for (auto listener : mScriptListeners)
          listener->RunCode(gTime, "on_grid_button("+ofToString(x)+", "+ofToString(y)+", "+ofToString(velocity)+")");
-      
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
+
       if (mGridControllerOwner)
          mGridControllerOwner->OnGridButton(x, y, velocity, this);
    }

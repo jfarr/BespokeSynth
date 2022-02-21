@@ -212,8 +212,10 @@
 #include "Push2Control.h"
 #include "PulseTrain.h"
 #include "NoteLatch.h"
+#if defined(BESPOKE_PYTHON_SUPPORT)
 #include "ScriptModule.h"
 #include "ScriptStatus.h"
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
 #include "ModulatorGravity.h"
 #include "NoteStreamDisplay.h"
 #include "PulseButton.h"
@@ -406,8 +408,10 @@ ModuleFactory::ModuleFactory()
    REGISTER(Push2Control, push2control, kModuleType_Other);
    REGISTER(PulseTrain, pulsetrain, kModuleType_Pulse);
    REGISTER(NoteLatch, notelatch, kModuleType_Note);
+#if defined(BESPOKE_PYTHON_SUPPORT)
    REGISTER(ScriptModule, script, kModuleType_Other);
    REGISTER(ScriptStatus, scriptstatus, kModuleType_Other);
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
    REGISTER(ModulatorGravity, gravity, kModuleType_Modulator);
    REGISTER(NoteStreamDisplay, notestream, kModuleType_Note);
    REGISTER(PulseButton, pulsebutton, kModuleType_Pulse);
@@ -482,7 +486,9 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
    REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
    REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
+#if defined(BESPOKE_PYTHON_SUPPORT)
    REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleType_Other);
+#endif // ifdef BESPOKE_PYTHON_SUPPORT
    REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleType_Audio);
 }
 
