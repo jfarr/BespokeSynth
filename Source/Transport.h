@@ -39,6 +39,7 @@ class ITimeListener
 public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(double time) = 0;
+   virtual void OnMoveTransport(double time) {}
 };
 
 enum NoteInterval
@@ -154,6 +155,7 @@ public:
    
 private:
    void UpdateListeners(double jumpMs);
+   void NotifyOnMoveTransport();
    double Swing(double measurePos);
    double SwingBeat(double pos);
    void Nudge(double amount);

@@ -72,6 +72,7 @@ void EventCanvas::Init()
    IDrawableModule::Init();
 
    TheTransport->AddAudioPoller(this);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
 }
 
 void EventCanvas::CreateUIControls()
@@ -118,26 +119,17 @@ EventCanvas::~EventCanvas()
 {
    mCanvas->SetListener(nullptr);
    TheTransport->RemoveAudioPoller(this);
+   TheTransport->RemoveListener(this);
 }
 
 void EventCanvas::OnTransportAdvanced(float amount)
 {
    PROFILER(EventCanvas);
    
-   if (mCanvas == nullptr)
+   if (!mEnabled || mCanvas == nullptr)
       return;
    
-   //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-   float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
-   
-   float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
-   FloatWrap(curPos, 1);
-   
-   mCanvas->SetCursorPos(curPos);
-   mPosition = curPos;
-   
-   if (!mEnabled)
-      return;
+   float curPos = GetCurPos();
    
    for (auto* canvasElement : mCanvas->GetElements())
    {
@@ -195,6 +187,22 @@ void EventCanvas::OnTransportAdvanced(float amount)
    mPreviousPosition = curPos;
 }
 
+float EventCanvas::GetCurPos()
+{
+    //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
+    float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
+
+    float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
+    FloatWrap(curPos, 1);
+    return curPos;
+}
+
+void EventCanvas::UpdateCurPos(float curPos)
+{
+    mCanvas->SetCursorPos(curPos);
+    mPosition = curPos;
+}
+
 void EventCanvas::UpdateNumColumns()
 {
    if (TheTransport->GetDuration(mInterval) < TheTransport->GetDuration(kInterval_1n))
@@ -217,6 +225,24 @@ IUIControl* EventCanvas::GetUIControlForRow(int row)
 ofColor EventCanvas::GetRowColor(int row) const
 {
    return mRowColors[row%mRowColors.size()];
+}
+
+void EventCanvas::OnTimeEvent(double time)
+{
+    if (mCanvas == nullptr)
+        return;
+
+    float curPos = GetCurPos();
+    UpdateCurPos(curPos);
+}
+
+void EventCanvas::OnMoveTransport(double time)
+{
+    if (mCanvas == nullptr)
+        return;
+
+    float curPos = GetCurPos();
+    UpdateCurPos(curPos);
 }
 
 void EventCanvas::CanvasUpdated(Canvas* canvas)
@@ -379,6 +405,9 @@ void EventCanvas::TextEntryComplete(TextEntry* entry)
    if (entry == mNumMeasuresEntry)
    {
       mCanvas->SetNumCols(TheTransport->CountInStandardMeasure(mInterval) * mNumMeasures);
+
+      float curPos = GetCurPos();
+      UpdateCurPos(curPos);
    }
 }
 

@@ -283,6 +283,13 @@ void PlaySequencer::OnTimeEvent(double time)
    UpdateLights();
 }
 
+void PlaySequencer::OnMoveTransport(double time)
+{
+    int step = GetStep(time);
+    mGrid->SetHighlightCol(time, step);
+    UpdateLights();
+}
+
 void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
 {
    if (mOwner->mSustain)

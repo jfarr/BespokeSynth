@@ -38,7 +38,7 @@ class CanvasControls;
 class PatchCableSource;
 class CanvasScrollbar;
 
-class EventCanvas : public IDrawableModule, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public IButtonListener, public IDropdownListener, public ITextEntryListener
+class EventCanvas : public IDrawableModule, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public ITimeListener, public IIntSliderListener, public IButtonListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    EventCanvas();
@@ -56,10 +56,17 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    
+   //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
+   //ITimeListener
+   void OnTimeEvent(double time) override;
+   void OnMoveTransport(double time) override;
+
+   //ICanvasListener
    void CanvasUpdated(Canvas* canvas) override;
    
+   //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
@@ -83,9 +90,11 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
+   float GetCurPos();
+   void UpdateCurPos(float curPos);
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
-   
+
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
    CanvasScrollbar* mCanvasScrollbarHorizontal;
@@ -101,7 +110,8 @@ private:
    bool mRecord;
    Checkbox* mRecordCheckbox;
    float mPreviousPosition;
-   
+   TransportListenerInfo* mTransportListenerInfo;
+
    struct ControlConnection
    {
       IUIControl* mUIControl;

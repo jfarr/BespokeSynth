@@ -40,6 +40,7 @@ void Polyrhythms::Init()
    IDrawableModule::Init();
 
    TheTransport->AddAudioPoller(this);
+   mTransportListenerInfo = TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), true);
 }
 
 void Polyrhythms::CreateUIControls()
@@ -55,7 +56,8 @@ void Polyrhythms::CreateUIControls()
 Polyrhythms::~Polyrhythms()
 {
    TheTransport->RemoveAudioPoller(this);
-   
+   TheTransport->RemoveListener(this);
+
    for (int i=0; i<mRhythmLines.size(); ++i)
       delete mRhythmLines[i];
 }
@@ -85,6 +87,20 @@ void Polyrhythms::OnTransportAdvanced(float amount)
 
       mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
    }
+}
+
+void Polyrhythms::OnTimeEvent(double time)
+{
+}
+
+void Polyrhythms::OnMoveTransport(double time)
+{
+    for (int i = 0; i < mRhythmLines.size(); ++i)
+    {
+        int beats = mRhythmLines[i]->mGrid->GetCols();
+        int quantized = int(TheTransport->GetMeasurePos(gTime) * beats);
+        mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
+    }
 }
 
 void Polyrhythms::DrawModule()

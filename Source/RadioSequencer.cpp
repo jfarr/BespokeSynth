@@ -193,6 +193,19 @@ void RadioSequencer::OnTimeEvent(double time)
       Step(time, 0);
 }
 
+void RadioSequencer::OnMoveTransport(double time)
+{
+    if (!mHasExternalPulseSource)
+    {
+        int length = mLength;
+        if (length <= 0)
+            length = 1;
+        mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, length);
+        mGrid->SetHighlightCol(time, mStep);
+        UpdateGridLights();
+    }
+}
+
 void RadioSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
