@@ -60,7 +60,7 @@ public:
    Polyrhythms* mOwner;
 };
 
-class Polyrhythms : public INoteSource, public IDrawableModule, public IAudioPoller, public IDropdownListener, public ITextEntryListener
+class Polyrhythms : public INoteSource, public IDrawableModule, public IAudioPoller, public ITimeListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    Polyrhythms();
@@ -77,6 +77,10 @@ public:
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
+
+   //ITimeListener
+   void OnTimeEvent(double time) override;
+   void OnMoveTransport(double time) override;
 
    //IClickable
    void MouseReleased() override;
@@ -100,6 +104,7 @@ private:
    float mWidth;
    float mHeight;
    std::array<RhythmLine*,8> mRhythmLines;
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__modularSynth__Polyrhythms__) */

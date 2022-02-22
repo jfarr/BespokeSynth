@@ -84,7 +84,8 @@ public:
    
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+   void OnMoveTransport(double time) override;
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
    
@@ -133,6 +134,7 @@ private:
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();
+   void UpdateStepUI(double time);
    void UpdateLights();
    void ShiftSteps(int amount);
    void UpdateVelocityGridPos();

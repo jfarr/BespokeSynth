@@ -64,6 +64,7 @@ public:
    
    //ITimeListener
    void OnTimeEvent(double time) override;
+   void OnMoveTransport(double time) override;
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;

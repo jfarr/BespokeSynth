@@ -569,6 +569,15 @@ void NoteStepSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
+void NoteStepSequencer::OnMoveTransport(double time)
+{
+    if (!mHasExternalPulseSource)
+    {
+        mArpIndex = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
+        UpdateStepUI(time);
+    }
+}
+
 void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 {
    if (!mEnabled)
@@ -659,11 +668,16 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       }
    }
    
-   mGrid->SetHighlightCol(time, mArpIndex);
-   mVelocityGrid->SetHighlightCol(time, mArpIndex);
-   
-   UpdateLights();
-   UpdateGridControllerLights(false);
+   UpdateStepUI(time);
+}
+
+void NoteStepSequencer::UpdateStepUI(double time)
+{
+    mGrid->SetHighlightCol(time, mArpIndex);
+    mVelocityGrid->SetHighlightCol(time, mArpIndex);
+
+    UpdateLights();
+    UpdateGridControllerLights(false);
 }
 
 void NoteStepSequencer::SendNoteToCable(int index, double time, int pitch, int velocity)

@@ -251,6 +251,7 @@ void Transport::DrawModule()
 void Transport::Reset(float rewindAmount)
 {
    mMeasureTime = -rewindAmount;
+   NotifyOnMoveTransport();
 }
 
 void Transport::ButtonClicked(ClickButton *button)
@@ -586,6 +587,15 @@ void Transport::UpdateListeners(double jumpMs)
          }
       }
    }
+}
+
+void Transport::NotifyOnMoveTransport()
+{
+    for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+    {
+        const TransportListenerInfo& info = *i;
+        info.mListener->OnMoveTransport(gTime);
+    }
 }
 
 void Transport::OnDrumEvent(NoteInterval drumEvent)
