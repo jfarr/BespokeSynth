@@ -470,6 +470,13 @@ void UIGrid::SetValRefactor(int row, int col, float val)
 
 void UIGrid::SetHighlightCol(double time, int col)
 {
+   for (size_t i = 0; i < mHighlightColBuffer.size(); ++i)
+   {
+       if (mHighlightColBuffer[i].time == time) {
+           mHighlightColBuffer[i].col = col;
+           return;
+       }
+   }
    mHighlightColBuffer[mNextHighlightColPointer].time = time;
    mHighlightColBuffer[mNextHighlightColPointer].col = col;
    mNextHighlightColPointer = (mNextHighlightColPointer + 1) % mHighlightColBuffer.size();

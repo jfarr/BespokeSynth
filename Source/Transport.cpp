@@ -268,6 +268,7 @@ void Transport::Reset()
 {
    mMeasureTime = 0;
    UpdateMeasurePos();
+   NotifyOnMoveTransport();
 }
 
 void Transport::UpdateMeasurePos()
@@ -279,13 +280,19 @@ void Transport::UpdateMeasurePos()
 void Transport::TextEntryComplete(TextEntry* entry)
 {
     if (entry == mMeasureEntry)
+    {
         SetMeasure(mMeasure - 1);
+        NotifyOnMoveTransport();
+    }
 }
 
 void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
     if (slider == mMeasurePosSlider)
+    {
         SetMeasureTime((int)mMeasureTime + mMeasurePos);
+        NotifyOnMoveTransport();
+    }
 }
 
 void Transport::ButtonClicked(ClickButton *button)
@@ -317,6 +324,7 @@ void Transport::SetTransportPosition(double time)
 {
     SetMeasureTime(time);
     UpdateMeasurePos();
+    NotifyOnMoveTransport();
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
@@ -645,6 +653,15 @@ void Transport::UpdateListeners(double jumpMs)
          }
       }
    }
+}
+
+void Transport::NotifyOnMoveTransport()
+{
+    for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+    {
+        const TransportListenerInfo& info = *i;
+        info.mListener->OnMoveTransport(gTime);
+    }
 }
 
 void Transport::OnDrumEvent(NoteInterval drumEvent)

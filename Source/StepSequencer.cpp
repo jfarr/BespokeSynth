@@ -675,6 +675,15 @@ void StepSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
+void StepSequencer::OnMoveTransport(double time)
+{
+    if (!mHasExternalPulseSource)
+    {
+        mCurrentColumn = GetStepNum(time);
+        UpdateStepUI(time);
+    }
+}
+
 void StepSequencer::Step(double time, float velocity, int pulseFlags)
 {
    if (!mIsSetUp)
@@ -713,15 +722,20 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
       mCurrentColumn = step;
    }
  
-   mGrid->SetHighlightCol(time, mCurrentColumn);
-   UpdateLights();
-   UpdateMetaLights();
+   UpdateStepUI(time);
 
    if (mHasExternalPulseSource)
    {
       for (auto& row : mRows)
          row->PlayStep(time, mCurrentColumn);
    }
+}
+
+void StepSequencer::UpdateStepUI(double time)
+{
+    mGrid->SetHighlightCol(time, mCurrentColumn);
+    UpdateLights();
+    UpdateMetaLights();
 }
 
 void StepSequencer::PlayStepNote(double time, int note, float val)

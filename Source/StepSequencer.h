@@ -137,7 +137,8 @@ public:
    
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+   void OnMoveTransport(double time) override;
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
@@ -182,6 +183,7 @@ private:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
    
+   void UpdateStepUI(double time);
    void UpdateLights(bool force = false);
    void UpdateVelocityLights();
    void UpdateMetaLights();

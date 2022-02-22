@@ -67,6 +67,7 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
+   void OnMoveTransport(double time) override;
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
