@@ -2597,10 +2597,9 @@ void ModularSynth::LoadState(std::string file)
    LockRender(true);
    mAudioPaused = false;
    mIsLoadingState = false;
+   TheTransport->Start();
    LockRender(false);
    mAudioThreadMutex.Unlock();
-
-   TheTransport->Start();
 }
 
 IAudioReceiver* ModularSynth::FindAudioReceiver(std::string name, bool fail)

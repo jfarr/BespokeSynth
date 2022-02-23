@@ -40,6 +40,7 @@ public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(double time) = 0;
    virtual void OnMoveTransport(double time) {}
+   virtual void OnUnquantizedTimeEvent(double time) {}
 };
 
 enum NoteInterval

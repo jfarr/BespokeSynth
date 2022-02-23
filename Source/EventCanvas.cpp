@@ -47,7 +47,7 @@ EventCanvas::EventCanvas()
 , mPosition(0)
 , mRecord(false)
 , mRecordCheckbox(nullptr)
-, mPreviousPosition(0)
+, mPreviousPosition(-1)
 {
    SetEnabled(true);
    
@@ -71,7 +71,6 @@ void EventCanvas::Init()
 {
    IDrawableModule::Init();
 
-   TheTransport->AddAudioPoller(this);
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
 }
 
@@ -118,18 +117,22 @@ void EventCanvas::CreateUIControls()
 EventCanvas::~EventCanvas()
 {
    mCanvas->SetListener(nullptr);
-   TheTransport->RemoveAudioPoller(this);
    TheTransport->RemoveListener(this);
 }
 
-void EventCanvas::OnTransportAdvanced(float amount)
+void EventCanvas::OnUnquantizedTimeEvent(double time)
 {
    PROFILER(EventCanvas);
    
-   if (!mEnabled || mCanvas == nullptr)
+   if (mCanvas == nullptr)
       return;
    
    float curPos = GetCurPos();
+   mCanvas->SetCursorPos(curPos);
+   mPosition = curPos;
+   
+   if (!mEnabled)
+      return;
    
    for (auto* canvasElement : mCanvas->GetElements())
    {
@@ -187,20 +190,29 @@ void EventCanvas::OnTransportAdvanced(float amount)
    mPreviousPosition = curPos;
 }
 
-float EventCanvas::GetCurPos()
+void EventCanvas::OnMoveTransport(double time)
 {
-    //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-    float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
-
-    float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
-    FloatWrap(curPos, 1);
-    return curPos;
+   float curPos = GetCurPos();
+   mCanvas->SetCursorPos(curPos);
+   mPosition = curPos;
+   mPreviousPosition = -1;
+   CancelEvents();
 }
 
-void EventCanvas::UpdateCurPos(float curPos)
+float EventCanvas::GetCurPos()
 {
-    mCanvas->SetCursorPos(curPos);
-    mPosition = curPos;
+   float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures;
+   FloatWrap(curPos, 1);
+   return curPos;
+}
+
+void EventCanvas::CancelEvents()
+{
+   for (auto* canvasElement : mCanvas->GetElements())
+   {
+      EventCanvasElement* element = static_cast<EventCanvasElement*>(canvasElement);
+      element->TriggerEnd();
+   }
 }
 
 void EventCanvas::UpdateNumColumns()
@@ -225,24 +237,6 @@ IUIControl* EventCanvas::GetUIControlForRow(int row)
 ofColor EventCanvas::GetRowColor(int row) const
 {
    return mRowColors[row%mRowColors.size()];
-}
-
-void EventCanvas::OnTimeEvent(double time)
-{
-    if (mCanvas == nullptr)
-        return;
-
-    float curPos = GetCurPos();
-    UpdateCurPos(curPos);
-}
-
-void EventCanvas::OnMoveTransport(double time)
-{
-    if (mCanvas == nullptr)
-        return;
-
-    float curPos = GetCurPos();
-    UpdateCurPos(curPos);
 }
 
 void EventCanvas::CanvasUpdated(Canvas* canvas)
@@ -406,8 +400,11 @@ void EventCanvas::TextEntryComplete(TextEntry* entry)
    {
       mCanvas->SetNumCols(TheTransport->CountInStandardMeasure(mInterval) * mNumMeasures);
 
-      float curPos = GetCurPos();
-      UpdateCurPos(curPos);
+      float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures;
+      FloatWrap(curPos, 1);
+
+      mCanvas->SetCursorPos(curPos);
+      mPosition = curPos;
    }
 }
 

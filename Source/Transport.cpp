@@ -130,6 +130,7 @@ void Transport::Start()
     {
         const TransportListenerInfo& info = *i;
         info.mListener->OnTimeEvent(gTime);
+        info.mListener->OnUnquantizedTimeEvent(gTime);
     }
 }
 
@@ -576,6 +577,9 @@ void Transport::UpdateListeners(double jumpMs)
    for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       const TransportListenerInfo& info = *i;
+
+      info.mListener->OnUnquantizedTimeEvent(gTime);
+
       if (info.mInterval != kInterval_None &&
           info.mInterval != kInterval_Free)
       {         
